@@ -13,6 +13,7 @@ export default {
           200: '#E8E8EA',
           400: '#BDBDBD',
           500: '#9F9F9F',
+          700: '#626262',
           900: '#222222'
         },
         'business': {
