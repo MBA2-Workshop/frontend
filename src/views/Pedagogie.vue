@@ -2,11 +2,18 @@
 import Sidebar from '../components/Sidebar.vue'
 import Header from '../components/Header.vue'
 import { useMainStore } from "../store/main";
-import { computed } from "vue";
+import { useUserStore } from "../store/user";
+import { computed, watch } from 'vue';
 
+const userStore = useUserStore();
 const mainStore = useMainStore();
+
 const count = computed(() => mainStore.count);
 const increment = mainStore.increment;
+
+watch(() => userStore.user, (user) => {
+  console.log(user);
+});
 </script>
 
 <template>
