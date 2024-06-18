@@ -2,6 +2,11 @@
 import { EyeIcon, EyeSlashIcon } from "@heroicons/vue/24/solid";
 import { ref } from "vue";
 import axiosInstance from "../services/axiosInstance";
+import { useRouter } from "vue-router";
+import { useUserStore } from "../store/user";
+
+const router = useRouter();
+const userStore = useUserStore();
 
 const email = ref("");
 const password = ref("");
@@ -67,8 +72,11 @@ const signin = async () => {
       last_name: "Doe",
       password: password.value
     });
-    data.value = response.data;
     error.value = null;
+    userStore.setUser(response.data.user);
+    userStore.setAccessToken(response.data.access);
+    userStore.setRefreshToken(response.data.refresh);
+    router.push({ name: 'Pedagogie' });
   } catch (err) {
     error.value = err.response ? err.response.data : "Une erreur s'est produite. Veuillez réessayer.";
   }
