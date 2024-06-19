@@ -33,15 +33,14 @@ export const useMainStore = defineStore('main', {
             title: event.label,
             start: formatDateTime(startDate, event.full_day),
             end: formatDateTime(endDate, event.full_day),
+            type: event.type,
+            full_day: event.full_day,
           }
         });
-        this.setEvents(dataset);
+        this.events = dataset;
       } catch (error) {
         console.error('Failed to fetch events', error);
       }
-    },
-    setEvents(events) {
-      this.events = events;
     },
     async addEvent(event) {
       try {
@@ -63,8 +62,37 @@ export const useMainStore = defineStore('main', {
         return null;
       }
     },
-    removeEvent(event) {
-      this.events = this.events.filter((e) => e.id !== event.id);
+    async updateEvent(event) {
+      try {
+        const response = await axiosInstance.patch(`/event/event/${event.id}/`, event);
+
+        const startDate = new Date(response.data.start_date);
+        const endDate = new Date(response.data.end_date);
+
+        const eventFormat = {
+          id: response.data.id,
+          title: response.data.label,
+          start: formatDateTime(startDate, response.data.full_day),
+          end: formatDateTime(endDate, response.data.full_day),
+          type: response.data.type,
+          full_day: response.data.full_day,
+        }
+        const index = this.events.findIndex((e) => e.id === event.id);
+        this.events[index] = eventFormat;
+        return eventFormat;
+      } catch (error) {
+        console.error('Failed to update event', error);
+        return null;
+      }
+    },
+    async deleteEvent(event) {
+      try {
+        await axiosInstance.delete(`/event/event/${event.id}/`);
+        this.events = this.events.filter((e) => e.id !== event.id);
+        return event.id;
+      } catch (error) {
+        console.error('Failed to delete event', error);
+      }
     }
   }
 });

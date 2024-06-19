@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@heroicons/vue": "^2.1.3",
+    "@schedule-x/current-time": "^1.46.4",
+    "@schedule-x/event-recurrence": "^1.46.4",
     "@schedule-x/events-service": "^1.46.4",
     "@schedule-x/theme-default": "^1.46.4",
     "@schedule-x/vue": "^1.43.4",
