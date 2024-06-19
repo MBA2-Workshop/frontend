@@ -32,6 +32,28 @@ const formatDate = (dateString) => {
   return `${date.getFullYear()}-${padToTwoDigits(date.getMonth() + 1)}-${padToTwoDigits(date.getDate())}T${padToTwoDigits(date.getHours())}:${padToTwoDigits(date.getMinutes())}:00`;
 };
 
+watch(() => editableEvent.value.full_day, (newAllDay) => {
+  setTimeout(() => {
+    if (editableEvent.value.start) {
+      const startDateClass = new Date(editableEvent.value.start);
+      if (newAllDay) {
+        editableEvent.value.start = `${startDateClass.getFullYear()}-${padToTwoDigits(startDateClass.getMonth() + 1)}-${padToTwoDigits(startDateClass.getDate())}`;
+      } else {
+        editableEvent.value.start = `${startDateClass.getFullYear()}-${padToTwoDigits(startDateClass.getMonth() + 1)}-${padToTwoDigits(startDateClass.getDate())}T${padToTwoDigits(startDateClass.getHours())}:${padToTwoDigits(startDateClass.getMinutes())}`;
+      }
+    }
+
+    if (editableEvent.value.end) {
+      const endDateClass = new Date(editableEvent.value.end);
+      if (newAllDay) {
+        editableEvent.value.end = `${endDateClass.getFullYear()}-${padToTwoDigits(endDateClass.getMonth() + 1)}-${padToTwoDigits(endDateClass.getDate())}`;
+      } else {
+        editableEvent.value.end = `${endDateClass.getFullYear()}-${padToTwoDigits(endDateClass.getMonth() + 1)}-${padToTwoDigits(endDateClass.getDate())}T${padToTwoDigits(endDateClass.getHours())}:${padToTwoDigits(endDateClass.getMinutes())}`;
+      }
+    }
+  }, 1);
+});
+
 const saveChanges = () => {
   const eventSaveFormat = {
     id: editableEvent.value.id,
@@ -72,7 +94,7 @@ const deleteEvent = () => {
           <select v-model="editableEvent.type"
             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300">
             <option value="1">Personnel</option>
-            <option value="2">Public</option>
+            <option value="2">Cour</option>
           </select>
         </div>
         <div class="grid grid-cols-2 gap-4">

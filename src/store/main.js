@@ -18,7 +18,11 @@ const formatDateTime = (date, fullDay) => {
 
 export const useMainStore = defineStore('main', {
   state: () => ({
-    events: []
+    events: [],
+    trainings: [],
+    selectedTraining: localStorage.getItem('selectedTraining') ? JSON.parse(localStorage.getItem('selectedTraining')) : null,
+    students: [],
+    instructors: [],
   }),
   actions: {
     async fetchEvents() {
@@ -93,6 +97,67 @@ export const useMainStore = defineStore('main', {
       } catch (error) {
         console.error('Failed to delete event', error);
       }
-    }
+    },
+    async fetchTrainings() {
+      try {
+        const response = await axiosInstance.get('/education/training/');
+        this.trainings = response.data;
+      } catch (error) {
+        console.error('Failed to fetch trainings', error);
+      }
+    },
+    async addTraining(training) {
+      try {
+        const response = await axiosInstance.post('/education/training/', training);
+        this.trainings.push(response.data);
+      } catch (error) {
+        console.error('Failed to add training', error);
+      }
+    },
+    async updateTraining(training) {
+      try {
+        const response = await axiosInstance.patch(`/education/training/${training.id}/`, training);
+        const index = this.trainings.findIndex((t) => t.id === training.id);
+        this.trainings[index] = response.data;
+      } catch (error) {
+        console.error('Failed to update training', error);
+      }
+    },
+    async deleteTraining(training) {
+      try {
+        await axiosInstance.delete(`/education/training/${training.id}/`);
+        this.trainings = this.trainings.filter((t) => t.id !== training.id);
+      } catch (error) {
+        console.error('Failed to delete training', error);
+      }
+    },
+    async fetchStudents() {
+      try {
+        const response = await axiosInstance.get('/education/student/');
+        this.students = response.data;
+      } catch (error) {
+        console.error('Failed to fetch students', error);
+      }
+    },
+    async fetchInstructors() {
+      try {
+        const response = await axiosInstance.get('/education/instructor/');
+        this.instructors = response.data;
+      } catch (error) {
+        console.error('Failed to fetch instructors', error);
+      }
+    },
+    setSelectedTraining(training) {
+      this.selectedTraining = training;
+      if (training) {
+        localStorage.setItem('selectedTraining', JSON.stringify(training));
+      } else {
+        localStorage.removeItem('selectedTraining');
+      }
+    },
+    clearSelectedTraining() {
+      this.selectedTraining = null;
+      localStorage.removeItem('selectedTraining');
+    },
   }
 });

@@ -3,7 +3,7 @@ import { AcademicCapIcon, HomeIcon, BuildingOffice2Icon, CpuChipIcon, DocumentIc
 </script>
 
 <template>
-  <div class="bg-white w-48 p-4 flex flex-col">
+  <div class="min-h-screen bg-white w-48 p-4 flex flex-col">
     <div class="mb-8">
       <img src="../assets/logo_carre.png" alt="Logo" class="h-12 w-12 mx-auto" />
     </div>

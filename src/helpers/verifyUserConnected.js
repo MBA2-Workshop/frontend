@@ -1,17 +1,17 @@
 import { useUserStore } from '../store/user';
-import { useRoute, useRouter } from 'vue-router';
+// import { useRoute, useRouter } from 'vue-router';
 import axiosInstance from '../services/axiosInstance'
 
 export default async function verifyUserConnected() {
   const userStore = useUserStore();
-  const route = useRoute();
-  const router = useRouter();
+  // const route = useRoute();
+  // const router = useRouter();
 
-  if (!localStorage.getItem('accessToken') && route.name !== 'Signin' && route.name !== 'Signup') {
-    router.push({ name: 'Signin' });
-  } else if (localStorage.getItem('accessToken') && (route.name === 'Signin' || route.name === 'Signup')) {
-    router.push({ name: 'Pedagogie' });
-  }
+  // if (!localStorage.getItem('accessToken') && route.name !== 'Signin' && route.name !== 'Signup' && route.name !== 'SetPassword') {
+  //   router.push({ name: 'Signin' });
+  // } else if (localStorage.getItem('accessToken') && (route.name === 'Signin' || route.name === 'Signup' || route.name === 'SetPassword')) {
+  //   router.push({ name: 'Pedagogie' });
+  // }
 
   if (!userStore.user && localStorage.getItem('accessToken')) {
     try {

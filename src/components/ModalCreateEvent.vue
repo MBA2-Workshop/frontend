@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { XMarkIcon } from '@heroicons/vue/24/solid';
 
 const padToTwoDigits = (num) => num.toString().padStart(2, '0');
@@ -22,6 +22,28 @@ const allDay = ref(false);
 const closeModal = () => {
   emit('close');
 };
+
+watch(allDay, (newAllDay) => {
+  setTimeout(() => {
+    if (startDate.value) {
+      const startDateClass = new Date(startDate.value);
+      if (newAllDay) {
+        startDate.value = `${startDateClass.getFullYear()}-${padToTwoDigits(startDateClass.getMonth() + 1)}-${padToTwoDigits(startDateClass.getDate())}`;
+      } else {
+        startDate.value = `${startDateClass.getFullYear()}-${padToTwoDigits(startDateClass.getMonth() + 1)}-${padToTwoDigits(startDateClass.getDate())}T${padToTwoDigits(startDateClass.getHours())}:${padToTwoDigits(startDateClass.getMinutes())}`;
+      }
+    }
+
+    if (endDate.value) {
+      const endDateClass = new Date(endDate.value);
+      if (newAllDay) {
+        endDate.value = `${endDateClass.getFullYear()}-${padToTwoDigits(endDateClass.getMonth() + 1)}-${padToTwoDigits(endDateClass.getDate())}`;
+      } else {
+        endDate.value = `${endDateClass.getFullYear()}-${padToTwoDigits(endDateClass.getMonth() + 1)}-${padToTwoDigits(endDateClass.getDate())}T${padToTwoDigits(endDateClass.getHours())}:${padToTwoDigits(endDateClass.getMinutes())}`;
+      }
+    }
+  }, 1);
+});
 
 const createEvent = () => {
   const startDateClass = new Date(startDate.value);
@@ -66,7 +88,7 @@ const createEvent = () => {
           <select id="type" v-model="type" required
             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300">
             <option value="1">Personnel</option>
-            <option value="2">Public</option>
+            <option value="2">Cour</option>
           </select>
         </div>
         <div class="grid grid-cols-2 gap-4">

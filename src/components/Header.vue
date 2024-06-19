@@ -1,6 +1,6 @@
 <script setup>
 import { BellIcon, MagnifyingGlassIcon, UserIcon, ChevronDownIcon } from '@heroicons/vue/24/solid'
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useUserStore } from '../store/user';
 import { useRouter } from 'vue-router';
 
@@ -28,6 +28,19 @@ const handleClickOutside = (event) => {
   }
 };
 
+const userRole = computed(() => {
+  switch (userStore.user?.role) {
+    case 1:
+      return "Étudiant";
+    case 2:
+      return "Formateur";
+    case 3:
+      return "Établissement";
+    default:
+      return 'Compte';
+  }
+});
+
 window.addEventListener('click', handleClickOutside);
 </script>
 
@@ -45,7 +58,7 @@ window.addEventListener('click', handleClickOutside);
         <div class="p-2 bg-neutral-0 rounded-full">
           <UserIcon class="size-5 rounded-full" />
         </div>
-        <span class="text-sm">Établissement</span>
+        <span class="text-sm">{{ userRole }}</span>
         <ChevronDownIcon class="size-5" />
       </div>
       <div v-if="showMenu" class="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-50">
