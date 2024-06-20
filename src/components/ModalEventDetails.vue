@@ -1,6 +1,8 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { XMarkIcon, TrashIcon } from '@heroicons/vue/24/solid';
+import { useMainStore } from '../store/main';
+import { useUserStore } from '../store/user';
 
 const props = defineProps({
   isOpen: {
@@ -13,6 +15,8 @@ const props = defineProps({
   }
 });
 
+const mainStore = useMainStore();
+const userStore = useUserStore();
 const emit = defineEmits(['close', 'save', 'delete']);
 
 const editableEvent = ref({ ...props.event });
@@ -62,7 +66,8 @@ const saveChanges = () => {
     end_date: formatDate(editableEvent.value.end),
     full_day: editableEvent.value.full_day,
     type: editableEvent.value.type,
-    instructor: null
+    training: editableEvent.value.type === 2 ? editableEvent.value.training : null,
+    instructor: editableEvent.value.type === 2 ? editableEvent.value.instructor : null
   };
   emit('save', eventSaveFormat);
   closeModal();
@@ -72,6 +77,10 @@ const deleteEvent = () => {
   emit('delete', editableEvent.value);
   closeModal();
 };
+
+const isEditable = computed(() => {
+  return userStore.user?.role === 3 || userStore.user?.id === editableEvent.value.user;
+});
 </script>
 
 <template>
@@ -86,34 +95,57 @@ const deleteEvent = () => {
       <div class="space-y-4 mt-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Intitulé</label>
-          <input type="text" v-model="editableEvent.title"
+          <input type="text" v-model="editableEvent.title" :disabled="!isEditable"
             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300" />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700">Type d'évènement</label>
-          <select v-model="editableEvent.type"
+          <select v-model="editableEvent.type" :disabled="!isEditable"
             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300">
             <option value="1">Personnel</option>
             <option value="2">Cour</option>
+          </select>
+        </div>
+        <div v-if="editableEvent.type === 2">
+          <label for="training" class="block text-sm font-medium text-gray-700">Formation</label>
+          <select id="training" v-model="editableEvent.training" :disabled="!isEditable"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300">
+            <option value="null">Aucune</option>
+            <option v-for="training in mainStore.trainings" :key="training.id" :value="training.id">
+              {{ training.name }}
+            </option>
+          </select>
+        </div>
+        <div v-if="editableEvent.type === 2">
+          <label for="instructor" class="block text-sm font-medium text-gray-700">Formateur</label>
+          <select id="instructor" v-model="editableEvent.instructor" :disabled="!isEditable"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300">
+            <option value="null">Aucun</option>
+            <option v-for="instructor in mainStore.instructors" :key="instructor.id" :value="instructor.id">
+              {{ `${instructor.first_name} ${instructor.last_name} - ${instructor.email}` }}
+            </option>
           </select>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700">Date de début</label>
             <input :type="editableEvent.full_day ? 'date' : 'datetime-local'" v-model="editableEvent.start"
+              :disabled="!isEditable"
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700">Date de fin</label>
             <input :type="editableEvent.full_day ? 'date' : 'datetime-local'" v-model="editableEvent.end"
+              :disabled="!isEditable"
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300" />
           </div>
         </div>
         <div class="flex items-center">
-          <input type="checkbox" v-model="editableEvent.full_day" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+          <input type="checkbox" v-model="editableEvent.full_day" :disabled="!isEditable"
+            class="h-4 w-4 text-blue-600 border-gray-300 rounded">
           <label class="ml-2 block text-sm text-gray-900">Dure toute la journée</label>
         </div>
-        <div class="flex justify-end space-x-4 mt-4">
+        <div v-if="isEditable" class="flex justify-end space-x-4 mt-4">
           <button @click="deleteEvent" class="px-4 py-2 bg-red-600 text-white rounded-md flex items-center space-x-2">
             <TrashIcon class="size-5" />
             <span>Supprimer</span>

@@ -19,6 +19,7 @@ const formatDateTime = (date, fullDay) => {
 export const useMainStore = defineStore('main', {
   state: () => ({
     events: [],
+    displayedEvents: [],
     trainings: [],
     selectedTraining: localStorage.getItem('selectedTraining') ? JSON.parse(localStorage.getItem('selectedTraining')) : null,
     students: [],
@@ -33,12 +34,11 @@ export const useMainStore = defineStore('main', {
           const endDate = new Date(event.end_date);
 
           return {
-            id: event.id,
+            ...event,
             title: event.label,
             start: formatDateTime(startDate, event.full_day),
             end: formatDateTime(endDate, event.full_day),
-            type: event.type,
-            full_day: event.full_day,
+            calendarId: event.type === 1 ? 'personal' : 'event',
           }
         });
         this.events = dataset;
@@ -54,10 +54,12 @@ export const useMainStore = defineStore('main', {
         const endDate = new Date(response.data.end_date);
 
         const eventFormat = {
-          id: response.data.id,
+          ...event,
           title: response.data.label,
+          type: Number(response.data.type),
           start: formatDateTime(startDate, response.data.full_day),
           end: formatDateTime(endDate, response.data.full_day),
+          calendarId: event.type === 1 ? 'personal' : 'event',
         }
         this.events.push(eventFormat);
         return eventFormat;
@@ -74,12 +76,11 @@ export const useMainStore = defineStore('main', {
         const endDate = new Date(response.data.end_date);
 
         const eventFormat = {
-          id: response.data.id,
+          ...event,
           title: response.data.label,
           start: formatDateTime(startDate, response.data.full_day),
           end: formatDateTime(endDate, response.data.full_day),
-          type: response.data.type,
-          full_day: response.data.full_day,
+          calendarId: event.type === 1 ? 'personal' : 'event',
         }
         const index = this.events.findIndex((e) => e.id === event.id);
         this.events[index] = eventFormat;
@@ -100,7 +101,7 @@ export const useMainStore = defineStore('main', {
     },
     async fetchTrainings() {
       try {
-        const response = await axiosInstance.get('/education/training/');
+        const response = await axiosInstance.get('/education/trainings/');
         this.trainings = response.data;
       } catch (error) {
         console.error('Failed to fetch trainings', error);
@@ -141,7 +142,7 @@ export const useMainStore = defineStore('main', {
     },
     async fetchInstructors() {
       try {
-        const response = await axiosInstance.get('/education/instructor/');
+        const response = await axiosInstance.get('/education/instructors/');
         this.instructors = response.data;
       } catch (error) {
         console.error('Failed to fetch instructors', error);
@@ -158,6 +159,16 @@ export const useMainStore = defineStore('main', {
     clearSelectedTraining() {
       this.selectedTraining = null;
       localStorage.removeItem('selectedTraining');
+    },
+    updateDisplayedEvents(filter) {
+      let filteredEvents = [...this.events];
+
+      if (filter.trainings.length) {
+        console.log(filteredEvents[2]);
+        filteredEvents = filteredEvents.filter((event) => filter.trainings.includes(event.training) || event.type === 1);
+      }
+
+      this.displayedEvents = filteredEvents;
     },
   }
 });

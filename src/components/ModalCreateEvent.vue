@@ -1,6 +1,7 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { XMarkIcon } from '@heroicons/vue/24/solid';
+import { useMainStore } from '../store/main';
 
 const padToTwoDigits = (num) => num.toString().padStart(2, '0');
 
@@ -11,6 +12,7 @@ const props = defineProps({
   }
 });
 
+const mainStore = useMainStore();
 const emit = defineEmits(['close', 'create']);
 
 const title = ref('');
@@ -18,10 +20,16 @@ const type = ref('1');
 const startDate = ref('');
 const endDate = ref('');
 const allDay = ref(false);
+const training = ref(mainStore.selectedTraining?.id || null);
+const instructor = ref(null);
 
 const closeModal = () => {
   emit('close');
 };
+
+watch(() => mainStore.selectedTraining, (newTraining) => {
+  training.value = newTraining?.id || null;
+});
 
 watch(allDay, (newAllDay) => {
   setTimeout(() => {
@@ -55,7 +63,8 @@ const createEvent = () => {
     end_date: `${endDateClass.getFullYear()}-${padToTwoDigits(endDateClass.getMonth() + 1)}-${padToTwoDigits(endDateClass.getDate())}T${padToTwoDigits(endDateClass.getHours())}:${padToTwoDigits(endDateClass.getMinutes())}:00`,
     full_day: allDay.value,
     type: type.value,
-    instructor: null
+    training: type.value === '2' ? training.value : null,
+    instructor: type.value === '2' ? instructor.value : null
   };
   emit('create', newEvent);
   closeModal();
@@ -65,7 +74,13 @@ const createEvent = () => {
   startDate.value = '';
   endDate.value = '';
   allDay.value = false;
+  instructor.value = null;
 };
+
+onMounted(async () => {
+  await mainStore.fetchTrainings();
+  await mainStore.fetchInstructors();
+});
 </script>
 
 <template>
@@ -89,6 +104,26 @@ const createEvent = () => {
             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300">
             <option value="1">Personnel</option>
             <option value="2">Cour</option>
+          </select>
+        </div>
+        <div v-if="type === '2'">
+          <label for="training" class="block text-sm font-medium text-gray-700">Formation</label>
+          <select id="training" v-model="training"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300">
+            <option value="null">Aucune</option>
+            <option v-for="training in mainStore.trainings" :key="training.id" :value="training.id">
+              {{ training.name }}
+            </option>
+          </select>
+        </div>
+        <div v-if="type === '2'">
+          <label for="instructor" class="block text-sm font-medium text-gray-700">Formateur</label>
+          <select id="instructor" v-model="instructor"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300">
+            <option value="null">Aucun</option>
+            <option v-for="instructor in mainStore.instructors" :key="instructor.id" :value="instructor.id">
+              {{ `${instructor.first_name} ${instructor.last_name} - ${instructor.email}` }}
+            </option>
           </select>
         </div>
         <div class="grid grid-cols-2 gap-4">

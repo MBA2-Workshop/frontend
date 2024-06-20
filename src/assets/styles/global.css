@@ -35,3 +35,7 @@ body {
 .sx__event {
   cursor: pointer;
 }
+
+.sx__current-time-indicator {
+  z-index: 1;
+}

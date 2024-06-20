@@ -46,7 +46,7 @@ onMounted(async () => {
 
 <template>
   <div class="flex">
-    <!-- <Sidebar /> -->
+    <Sidebar />
     <div class="flex flex-col flex-1">
       <Header />
       <main class="px-8 py-4 flex-1">

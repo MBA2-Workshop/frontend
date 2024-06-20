@@ -5,7 +5,7 @@ import { useUserStore } from '../store/user';
 import ModalCreateTraining from './ModalCreateTraining.vue';
 import ModalTrainingDetails from './ModalTrainingDetails.vue';
 import { PencilIcon } from '@heroicons/vue/24/solid';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const router = useRouter();
 const mainStore = useMainStore();
@@ -48,6 +48,15 @@ const saveTraining = async (training) => {
 const deleteTraining = async (training) => {
   await mainStore.deleteTraining(training);
 };
+
+onMounted(async () => {
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeDetailsModal();
+      closeCreateModal();
+    }
+  })
+});
 </script>
 
 <template>
@@ -68,8 +77,8 @@ const deleteTraining = async (training) => {
         </button>
       </li>
     </ul>
-    <button v-if="userStore.user?.role === 3" class="w-full mt-4 px-4 py-2 bg-business-700 hover:bg-business-800 text-white rounded"
-      @click="openCreateModal">
+    <button v-if="userStore.user?.role === 3"
+      class="w-full mt-4 px-4 py-2 bg-business-700 hover:bg-business-800 text-white rounded" @click="openCreateModal">
       Créer une nouvelle formation
     </button>
     <ModalCreateTraining :isOpen="isCreateModalOpen" @close="closeCreateModal" @create="createTraining" />
