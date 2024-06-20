@@ -103,7 +103,7 @@ const isEditable = computed(() => {
           <select v-model="editableEvent.type" :disabled="!isEditable"
             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring focus:border-blue-300">
             <option value="1">Personnel</option>
-            <option value="2">Cour</option>
+            <option value="2">Cours</option>
           </select>
         </div>
         <div v-if="editableEvent.type === 2">
