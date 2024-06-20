@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Signin from '../views/Signin.vue';
 import Signup from '../views/Signup.vue';
 import Pedagogie from '../views/Pedagogie.vue';
+import SetPassword from '../views/SetPassword.vue';
 
 const routes = [
   {
@@ -18,6 +19,11 @@ const routes = [
     path: '/pedagogie',
     name: 'Pedagogie',
     component: Pedagogie
+  },
+  {
+    path: '/set-password',
+    name: 'SetPassword',
+    component: SetPassword
   }
 ];
 
